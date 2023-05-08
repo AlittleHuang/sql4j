@@ -16,12 +16,12 @@ public interface ComparableOperator<T, U extends Comparable<?>, BUILDER>
     BUILDER gt(U value);
 
     /**
-     * less than or equal to (<=)
+     * less than or equal to
      */
     BUILDER le(U value);
 
     /**
-     * less than (<)
+     * less than
      */
     BUILDER lt(U value);
 
@@ -38,14 +38,14 @@ public interface ComparableOperator<T, U extends Comparable<?>, BUILDER>
     BUILDER gt(ComparableGetter<T, U> value);
 
     /**
-     * less than or equal to (<=)
+     * less than or equal to
      */
     BUILDER le(ComparableGetter<T, U> value);
 
     BUILDER between(ComparableGetter<T, U> a, ComparableGetter<T, U> b);
 
     /**
-     * less than (<)
+     * less than
      */
     BUILDER lt(ComparableGetter<T, U> value);
 
