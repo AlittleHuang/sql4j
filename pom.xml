@@ -4,9 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>github.alittlehuang.sql4j</groupId>
+    <groupId>io.github.alittlehuang</groupId>
     <artifactId>sql4j</artifactId>
     <version>2.1.0</version>
+
+    <packaging>pom</packaging>
 
     <modules>
         <module>sql4j-dsl4jpa</module>
@@ -15,7 +17,6 @@
         <module>dsl4jdbc-mysql</module>
     </modules>
 
-    <packaging>pom</packaging>
 
     <dependencyManagement>
         <dependencies>
@@ -68,6 +69,95 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>sql dsl for java</description>
+    <url>https://github.com/AlittleHuang/sql4j/tree/2.1.0</url>
+
+    <scm>
+        <connection>https://github.com/AlittleHuang/sql4j.git</connection>
+        <developerConnection>https://github.com/AlittleHuang/sql4j.git</developerConnection>
+        <url>https://github.com/AlittleHuang/sql4j/tree/2.1.0</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>huangchengwei</name>
+            <email>huang.chengwei@outlook.com</email>
+            <url>https://github.com/AlittleHuang</url>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <charset>UTF-8</charset>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>

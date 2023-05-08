@@ -14,8 +14,7 @@ public class JpaTypeQueryFactory implements ResultBuilderFactory {
     private final ProjectionMetaProvider metaProvider;
 
     public JpaTypeQueryFactory(EntityManager entityManager) {
-        this.entityManager = entityManager;
-        metaProvider = null;
+        this(entityManager, ProjectionMetaProvider.DEFAULT);
     }
 
     public JpaTypeQueryFactory(EntityManager entityManager, ProjectionMetaProvider metaProvider) {
