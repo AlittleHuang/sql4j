@@ -44,4 +44,5 @@ public final class DefaultTuple implements Tuple {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
 }

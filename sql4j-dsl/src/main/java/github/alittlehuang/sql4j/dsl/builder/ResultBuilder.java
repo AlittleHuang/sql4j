@@ -62,7 +62,7 @@ public interface ResultBuilder<T> {
     }
 
     default List<T> getList(int offset) {
-        return getList(offset, Integer.MAX_VALUE);
+        return getList(offset, IGNORED);
     }
 
     default List<T> getList() {
@@ -114,7 +114,7 @@ public interface ResultBuilder<T> {
     }
 
     default List<T> getList(int offset, LockModeType lockModeType) {
-        return getList(offset, Integer.MAX_VALUE, lockModeType);
+        return getList(offset, IGNORED, lockModeType);
     }
 
     default List<T> getList(LockModeType lockModeType) {

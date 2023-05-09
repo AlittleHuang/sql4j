@@ -2,10 +2,12 @@ package github.alittlehuang.sql4j.test;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import github.alittlehuang.sql4j.dsl.QueryBuilder;
+import github.alittlehuang.sql4j.jdbc.JdbcQueryBuilder;
+import github.alittlehuang.sql4j.jdbc.mapper.EntityTableMappers;
+import github.alittlehuang.sql4j.jdbc.mapper.jpa.JpaEntityTableMappers;
+import github.alittlehuang.sql4j.jdbc.mysql.MysqlSqlBuilder;
+import github.alittlehuang.sql4j.jdbc.sql.SqlExecutor;
 import github.alittlehuang.sql4j.test.entity.User;
-import jdbc.JdbcQueryBuilder;
-import jdbc.mysql.MysqlSqlBuilder;
-import jdbc.sql.SqlExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -20,7 +22,8 @@ public class JdbcTest extends JpaTest {
         source.setUrl("jdbc:mysql:///sql-dsl");
         source.setUser("root");
         source.setPassword("root");
-        QueryBuilder queryBuilder = new JdbcQueryBuilder(SqlExecutor.fromDatasource(source), MysqlSqlBuilder::new);
+        EntityTableMappers mappers = JpaEntityTableMappers.getInstance();
+        QueryBuilder queryBuilder = new JdbcQueryBuilder(SqlExecutor.fromDatasource(source), (criteria, javaType) -> new MysqlSqlBuilder(criteria, javaType, mappers), mappers);
         userQuery = queryBuilder.query(User.class);
     }
 }

@@ -6,6 +6,7 @@ import github.alittlehuang.sql4j.dsl.support.builder.projection.meta.impl.Defaul
 public interface ProjectionMetaProvider {
 
     ProjectionMetaProvider DEFAULT = DefaultProjectionMetaProvider.DEFAULT;
+
     ProjectionMeta getProjectionAttributes(Class<?> entityType, Class<?> projectionType);
 
 }

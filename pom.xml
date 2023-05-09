@@ -6,15 +6,15 @@
 
     <groupId>io.github.alittlehuang</groupId>
     <artifactId>sql4j</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 
     <packaging>pom</packaging>
 
     <modules>
-        <module>sql4j-dsl4jpa</module>
+        <module>sql4j-jpa</module>
         <module>sql4j-dsl</module>
         <module>test</module>
-        <module>dsl4jdbc-mysql</module>
+        <module>dsl4j-jdbc</module>
     </modules>
 
 

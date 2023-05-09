@@ -29,6 +29,7 @@
 ```
 
 ### logback.xml
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
@@ -103,6 +104,7 @@ public class Company implements Persistable {
 ```
 
 ### github/alittlehuang/sql4j/example/Employee.java
+
 ```java
 package github.alittlehuang.sql4j.example;
 
