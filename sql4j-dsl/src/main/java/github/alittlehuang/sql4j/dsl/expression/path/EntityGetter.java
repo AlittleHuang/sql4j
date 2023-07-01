@@ -5,7 +5,7 @@ import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 @FunctionalInterface
 public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, R> {
 
-    default <V extends Persistable> EntityGetter<T, V> map(EntityGetter<R, V> reference) {
+    default <V extends Persistable> EntityGetter<T, V> to(EntityGetter<R, V> reference) {
         return new EntityGetter<>() {
             @Override
             public V methodReference(T t) {
@@ -19,7 +19,7 @@ public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, 
         };
     }
 
-    default <V extends Number & Comparable<?>> NumberGetter<T, V> map(NumberGetter<R, V> reference) {
+    default <V extends Number & Comparable<?>> NumberGetter<T, V> to(NumberGetter<R, V> reference) {
         return new NumberGetter<>() {
             @Override
             public V methodReference(T t) {
@@ -33,7 +33,7 @@ public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, 
         };
     }
 
-    default <V extends Comparable<?>> ComparableGetter<T, V> map(ComparableGetter<R, V> reference) {
+    default <V extends Comparable<?>> ComparableGetter<T, V> to(ComparableGetter<R, V> reference) {
         return new ComparableGetter<>() {
             @Override
             public V methodReference(T t) {
@@ -47,7 +47,7 @@ public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, 
         };
     }
 
-    default StringGetter<T> map(StringGetter<R> attribute) {
+    default StringGetter<T> to(StringGetter<R> attribute) {
         return new StringGetter<>() {
             @Override
             public String methodReference(T t) {
@@ -61,7 +61,7 @@ public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, 
         };
     }
 
-    default BooleanGetter<T> map(BooleanGetter<R> attribute) {
+    default BooleanGetter<T> to(BooleanGetter<R> attribute) {
         return new BooleanGetter<>() {
             @Override
             public Boolean methodReference(T t) {
@@ -75,7 +75,7 @@ public interface EntityGetter<T, R extends Persistable> extends ColumnGetter<T, 
         };
     }
 
-    default <V> ColumnGetter<T, V> map(ColumnGetter<R, V> reference) {
+    default <V> ColumnGetter<T, V> to(ColumnGetter<R, V> reference) {
         return new ColumnGetter<>() {
             @Override
             public V methodReference(T t) {

@@ -57,6 +57,7 @@ public class ConstantArray<T> implements Array<T> {
         return values.length;
     }
 
+    @Override
     public ConstantArray<T> replace(int index, UnaryOperator<T> operator) {
         T t = get(index);
         T apply = operator.apply(t);

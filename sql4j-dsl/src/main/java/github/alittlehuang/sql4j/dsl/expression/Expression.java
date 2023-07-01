@@ -1,6 +1,7 @@
 package github.alittlehuang.sql4j.dsl.expression;
 
 import github.alittlehuang.sql4j.dsl.support.builder.operator.ConstantArray;
+import github.alittlehuang.sql4j.dsl.util.Array;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public sealed interface Expression extends ExpressionSupplier permits PathExpres
         return of(array, operator);
     }
 
-    static OperatorExpression of(ConstantArray<Expression> array, Operator operator) {
+    static OperatorExpression of(Array<Expression> array, Operator operator) {
         return new OperatorExpression(array, operator);
     }
 

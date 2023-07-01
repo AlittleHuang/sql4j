@@ -140,7 +140,7 @@ public class JpaTest {
         User user = userQuery
                 .where(User::getId).eq(userId)
                 .fetch(User::getParentUser)
-                .fetch(ColumnGetter.of(User::getParentUser).map(User::getParentUser))
+                .fetch(ColumnGetter.of(User::getParentUser).to(User::getParentUser))
                 .getSingle();
         assertNotNull(user);
         assertEquals(user.getId(), userId);
@@ -560,7 +560,7 @@ public class JpaTest {
     public void testPredicateAssembler() {
 
         List<User> qList = userQuery.where(User::isValid).eq(true)
-                .and(User::getParentUser).map(User::getUsername).eq(username)
+                .and(User::getParentUser).to(User::getUsername).eq(username)
                 .getList();
         List<User> fList = allUsers.stream()
                 .filter(user -> user.isValid()
@@ -616,12 +616,12 @@ public class JpaTest {
         Date time = allUsers.get(20).getTime();
 
         qList = userQuery.where(User::isValid).eq(true)
-                .or(User::getParentUser).map(User::getUsername).eq(username)
+                .or(User::getParentUser).to(User::getUsername).eq(username)
                 .and(User::getTime).ge(time)
                 .getList();
 
         List<User> jeremy_keynes = userQuery.where(User::isValid).eq(true)
-                .or(User::getParentUser).map(User::getUsername).eq(username)
+                .or(User::getParentUser).to(User::getUsername).eq(username)
                 .fetch(User::getParentUser)
                 .and(User::getTime).ge(time)
                 .getList();
@@ -669,7 +669,7 @@ public class JpaTest {
         assertEquals((qList), (fList));
 
         qList = userQuery.where(User::getRandomNumber).not().eq(6)
-                .and(User::getParentUser).map(User::isValid).eq(true)
+                .and(User::getParentUser).to(User::isValid).eq(true)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -679,7 +679,7 @@ public class JpaTest {
         assertEquals((qList), (fList));
 
         qList = userQuery.where(User::getRandomNumber).not().eq(6)
-                .and(User::getParentUser).map(User::isValid).not().eq(true)
+                .and(User::getParentUser).to(User::isValid).not().eq(true)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -689,7 +689,7 @@ public class JpaTest {
         assertEquals((qList), (fList));
 
         qList = userQuery.where(User::getRandomNumber).not().eq(6)
-                .or(User::getParentUser).map(User::isValid).not().eq(true)
+                .or(User::getParentUser).to(User::isValid).not().eq(true)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getRandomNumber() != 6
@@ -1045,7 +1045,7 @@ public class JpaTest {
         assertEquals(first, f);
 
         List<User> resultList = userQuery
-                .where(User::getParentUser).map(User::isValid)
+                .where(User::getParentUser).to(User::isValid)
                 .eq(true)
                 .getList();
         List<User> fList = allUsers.stream()
@@ -1058,7 +1058,7 @@ public class JpaTest {
     @Test
     public void testWhere() {
         List<User> resultList = userQuery
-                .where(User::getParentUser).map(User::getUsername).eq(username)
+                .where(User::getParentUser).to(User::getUsername).eq(username)
                 .getList();
         List<User> fList = allUsers.stream()
                 .filter(user -> user.getParentUser() != null && username.equals(user.getParentUser().getUsername()))
@@ -1066,7 +1066,7 @@ public class JpaTest {
         assertEquals(resultList, fList);
 
         resultList = userQuery
-                .where(User::getParentUser).map(User::getUsername).not().eq(username)
+                .where(User::getParentUser).to(User::getUsername).not().eq(username)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> user.getParentUser() != null && !username.equals(user.getParentUser().getUsername()))
@@ -1104,7 +1104,7 @@ public class JpaTest {
     @Test
     public void testPathBuilder() {
         List<User> resultList = userQuery.where(User::getParentUser)
-                .map(User::getParentUser).map(User::getUsername).eq(username)
+                .to(User::getParentUser).to(User::getUsername).eq(username)
                 .getList();
         List<User> fList = allUsers.stream()
                 .filter(user -> {
@@ -1115,7 +1115,7 @@ public class JpaTest {
         assertEquals(resultList, fList);
 
         resultList = userQuery.where(User::getParentUser)
-                .map(User::getRandomNumber).eq(5)
+                .to(User::getRandomNumber).eq(5)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> {
@@ -1126,7 +1126,7 @@ public class JpaTest {
         assertEquals(resultList, fList);
 
         resultList = userQuery.where(User::getParentUser)
-                .map(User::getRandomNumber).eq(5)
+                .to(User::getRandomNumber).eq(5)
                 .getList();
         fList = allUsers.stream()
                 .filter(user -> {

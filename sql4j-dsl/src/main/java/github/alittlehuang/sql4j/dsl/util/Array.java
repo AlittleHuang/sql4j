@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -38,17 +39,14 @@ public interface Array<T> extends Iterable<T> {
                 return get(cursor++);
             }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException("remove");
-            }
-
         };
     }
 
     default Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
+
+    Array<T> replace(int index, UnaryOperator<T> operator);
 
     Array<T> join(T item);
 

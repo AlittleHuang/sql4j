@@ -6,7 +6,7 @@
 
     <groupId>io.github.alittlehuang</groupId>
     <artifactId>sql4j</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
 
     <packaging>pom</packaging>
 
@@ -83,12 +83,12 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>sql dsl for java</description>
-    <url>https://github.com/AlittleHuang/sql4j/tree/2.1.0</url>
+    <url>https://github.com/AlittleHuang/sql4j/tree/2.3.x</url>
 
     <scm>
         <connection>https://github.com/AlittleHuang/sql4j.git</connection>
         <developerConnection>https://github.com/AlittleHuang/sql4j.git</developerConnection>
-        <url>https://github.com/AlittleHuang/sql4j/tree/2.1.0</url>
+        <url>https://github.com/AlittleHuang/sql4j/tree/2.3.x</url>
     </scm>
 
     <developers>

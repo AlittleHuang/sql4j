@@ -73,12 +73,16 @@ public class Attribute implements AttributeColumnMapper {
         boolean accessible = field.canAccess(entity);
         try {
             if (setter != null) {
-                setter.invoke(entity, value);
-            } else {
-                if (!accessible) {
-                    field.setAccessible(true);
+                if (value != null || !setter.getParameterTypes()[0].isPrimitive()) {
+                    setter.invoke(entity, value);
                 }
-                field.set(entity, value);
+            } else {
+                if (value != null || !field.getType().isPrimitive()) {
+                    if (!accessible) {
+                        field.setAccessible(true);
+                    }
+                    field.set(entity, value);
+                }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
