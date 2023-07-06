@@ -178,7 +178,7 @@ public class Example {
         // employee left join company
         // on employee.company_id = company.id
         // where company.name = 'Microsoft'
-        query.where(Employee::getCompany).map(Company::getName).eq("Microsoft").getList();
+        query.where(Employee::getCompany).to(Company::getName).eq("Microsoft").getList();
     }
 
 }
