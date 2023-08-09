@@ -6,9 +6,7 @@ import github.alittlehuang.sql4j.dsl.expression.*;
 import github.alittlehuang.sql4j.dsl.support.QuerySpecification;
 import github.alittlehuang.sql4j.dsl.util.Array;
 import github.alittlehuang.sql4j.dsl.util.Assert;
-import github.alittlehuang.sql4j.jdbc.mapper.AttributeColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.EntityTableMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.EntityTableMappers;
+import github.alittlehuang.sql4j.jdbc.mapper.*;
 import github.alittlehuang.sql4j.jdbc.sql.PreparedSql;
 import github.alittlehuang.sql4j.jdbc.sql.PreparedSqlBuilder;
 import github.alittlehuang.sql4j.jdbc.sql.SelectedPreparedSql;
@@ -25,17 +23,13 @@ import static github.alittlehuang.sql4j.dsl.expression.Operator.AND;
 public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
     protected final QuerySpecification criteria;
-    protected final EntityTableMapper<?> rootEntityInfo;
-    protected final EntityTableMappers mappers;
+    protected final TableMapper rootEntityInfo;
+    protected final TableMapperFactory mappers;
 
-    public MysqlSqlBuilder(QuerySpecification criteria, Class<?> javaType, EntityTableMappers mappers) {
+    public MysqlSqlBuilder(QuerySpecification criteria, Class<?> javaType, TableMapperFactory mappers) {
         this.criteria = criteria;
         this.mappers = mappers;
-        this.rootEntityInfo = getEntityInformation(javaType);
-    }
-
-    public static PathExpression to(PathExpression expression, String path) {
-        return expression.to(path);
+        this.rootEntityInfo = getTableMapper(javaType);
     }
 
     @Override
@@ -58,12 +52,12 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         return new Builder().count();
     }
 
-    public EntityTableMapper<?> getEntityInformation(AttributeColumnMapper attribute) {
-        return getEntityInformation(attribute.getJavaType());
+    private TableMapper getTableMapper(ColumnMapper attribute) {
+        return getTableMapper(attribute.getJavaType());
     }
 
-    public EntityTableMapper<?> getEntityInformation(Class<?> clazz) {
-        EntityTableMapper<?> info = mappers.getMapper(clazz);
+    private TableMapper getTableMapper(Class<?> clazz) {
+        TableMapper info = mappers.getMapper(clazz);
         Assert.notNull(info, "the type " + clazz + " is not an entity type");
         return info;
     }
@@ -82,7 +76,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
         protected void appendEntityPath() {
             String join = "";
-            for (AttributeColumnMapper basicAttribute : rootEntityInfo.getBasicAttributes()) {
+            for (BasicColumnMapper basicAttribute : rootEntityInfo.getBasicColumnMappers()) {
                 sql.append(join);
                 PathExpression path = new PathExpression(basicAttribute.getFieldName());
                 appendPath(path);
@@ -95,9 +89,9 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             Array<PathExpression> fetchClause = criteria.fetchClause();
             if (fetchClause != null) {
                 for (PathExpression fetch : fetchClause) {
-                    AttributeColumnMapper attribute = getAttribute(fetch);
-                    EntityTableMapper<?> entityInfo = getEntityInformation(attribute);
-                    for (AttributeColumnMapper basicAttribute : entityInfo.getBasicAttributes()) {
+                    ColumnMapper attribute = getAttribute(fetch);
+                    TableMapper entityInfo = getTableMapper(attribute);
+                    for (BasicColumnMapper basicAttribute : entityInfo.getBasicColumnMappers()) {
                         sql.append(",");
                         PathExpression path = fetch.to(basicAttribute.getFieldName());
                         appendPath(path);
@@ -161,7 +155,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
         protected PreparedSql exist(int offset) {
             sql.append("select ");
-            AttributeColumnMapper attribute = rootEntityInfo.getIdAttribute();
+            BasicColumnMapper attribute = rootEntityInfo.getIdColumnMapper();
             appendRootTableAlias();
             sql.append(".`").append(attribute.getColumnName()).append("`");
             appendBlank()
@@ -178,7 +172,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
 
         protected PreparedSql count() {
             sql.append("select count(");
-            AttributeColumnMapper attribute = rootEntityInfo.getIdAttribute();
+            BasicColumnMapper attribute = rootEntityInfo.getIdColumnMapper();
             appendRootTableAlias();
             sql.append(".`").append(attribute.getColumnName()).append("`)");
             appendBlank()
@@ -216,9 +210,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         }
 
         protected StringBuilder appendBlank() {
-            return sql.length() > 0 && " (".indexOf(sql.charAt(sql.length() - 1)) < 0
-                    ? sql.append(' ')
-                    : sql;
+            return sql.length() == 0 || " (,+-*/=><".indexOf(sql.charAt(sql.length() - 1)) >= 0 ? sql : sql.append(' ');
         }
 
 
@@ -263,7 +255,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                 // noinspection EnhancedSwitchMigration
                 switch (operator) {
                     case NOT:
-                        appendBlank().append(jdbcOperator);
+                        appendOperator(jdbcOperator);
                         sql.append(' ');
                         if (operator0 != null && JdbcOperator.of(operator0).getPrecedence()
                                                  > jdbcOperator.getPrecedence()) {
@@ -298,8 +290,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                             appendExpressions(args, e0);
                         }
                         for (int i = 1; i < list.length(); i++) {
-                            appendBlank();
-                            sql.append(jdbcOperator);
+                            appendOperator(jdbcOperator);
                             Expression e1 = list.get(i);
                             Operator operator1 = getOperator(e1);
                             if (operator1 != null && JdbcOperator.of(operator1).getPrecedence()
@@ -325,7 +316,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     case COUNT:
                     case AVG:
                     case SUM: {
-                        appendBlank().append(jdbcOperator);
+                        appendOperator(jdbcOperator);
                         String join = "(";
                         for (Expression expression : list) {
                             sql.append(join);
@@ -341,8 +332,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                         } else {
                             appendBlank();
                             appendExpression(e0);
-
-                            appendBlank().append(jdbcOperator);
+                            appendOperator(jdbcOperator);
                             char join = '(';
                             for (int i = 1; i < list.length(); i++) {
                                 Expression expression = list.get(i);
@@ -357,7 +347,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     case BETWEEN:
                         appendBlank();
                         appendExpressions(args, list.get(0));
-                        appendBlank().append(jdbcOperator).append(" ");
+                        appendOperator(jdbcOperator);
+                        appendBlank();
                         appendExpressions(args, list.get(1).operate(AND, list.get(2)));
                         break;
                     default:
@@ -366,6 +357,14 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             } else {
                 throw new UnsupportedOperationException("unknown expression type " + e.getClass());
             }
+        }
+
+        private void appendOperator(JdbcOperator jdbcOperator) {
+            String sign = jdbcOperator.getSign();
+            if (Character.isLetter(sign.charAt(0))) {
+                appendBlank();
+            }
+            sql.append(sign);
         }
 
 
@@ -383,10 +382,16 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             PathExpression join = new PathExpression(expression.get(0));
 
             for (String path : expression.path()) {
-                EntityTableMapper<?> info = getEntityInformation(type);
-                AttributeColumnMapper attribute = info.getAttribute(path);
+                TableMapper info = getTableMapper(type);
+                ColumnMapper attribute = info.getMapperByAttributeName(path);
                 if (i++ == iMax) {
-                    sb.append('`').append(attribute.getColumnName()).append('`');
+                    if (attribute instanceof JoinColumnMapper joinColumnMapper) {
+                        sb.append('`').append(joinColumnMapper.getJoinColumnName()).append('`');
+                    } else if (attribute instanceof BasicColumnMapper basicColumnMapper) {
+                        sb.append('`').append(basicColumnMapper.getColumnName()).append('`');
+                    } else {
+                        throw new IllegalStateException();
+                    }
                     return;
                 } else {
                     joins.putIfAbsent(join, joins.size());
@@ -396,7 +401,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     }
                 }
                 type = attribute.getJavaType();
-                join = to(join, path);
+                join = join.to(path);
             }
         }
 
@@ -404,8 +409,8 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             StringBuilder sql = new StringBuilder();
 
             joins.forEach((k, v) -> {
-                AttributeColumnMapper attribute = getAttribute(k);
-                EntityTableMapper<?> entityInfo = getEntityInformation(attribute);
+                ColumnMapper attribute = getAttribute(k);
+                TableMapper entityInfo = getTableMapper(attribute);
                 sql.append(" left join `").append(entityInfo.getTableName()).append("` ");
 
                 appendTableAttribute(sql, attribute, v);
@@ -415,16 +420,20 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
                     appendRootTableAlias(sql);
                 } else {
                     Integer parentIndex = joins.get(parent);
-                    AttributeColumnMapper parentAttribute = getAttribute(parent);
+                    ColumnMapper parentAttribute = getAttribute(parent);
                     appendTableAttribute(sql, parentAttribute, parentIndex);
                 }
-                sql.append(".`").append(attribute.getJoinColumn().name()).append("`=");
-                appendTableAttribute(sql, attribute, v);
-                String referenced = attribute.getJoinColumn().referencedColumnName();
-                if (referenced.length() == 0) {
-                    referenced = entityInfo.getIdAttribute().getColumnName();
+                if (attribute instanceof JoinColumnMapper join) {
+                    sql.append(".`").append(join.getJoinColumnName()).append("`=");
+                    appendTableAttribute(sql, attribute, v);
+                    String referenced = join.getJoinColumnReferencedName();
+                    if (referenced.length() == 0) {
+                        referenced = entityInfo.getIdColumnMapper().getColumnName();
+                    }
+                    sql.append(".`").append(referenced).append('`');
+                } else {
+                    throw new IllegalStateException();
                 }
-                sql.append(".`").append(referenced).append('`');
             });
             this.sql.insert(sqlIndex, sql);
 
@@ -434,19 +443,19 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
             return e instanceof OperatorExpression expression ? expression.operator() : null;
         }
 
-        protected StringBuilder appendTableAttribute(StringBuilder sb, AttributeColumnMapper attribute, Integer index) {
-            EntityTableMapper<?> information = getEntityInformation(attribute.getJavaType());
+        protected StringBuilder appendTableAttribute(StringBuilder sb, ColumnMapper attribute, Integer index) {
+            TableMapper information = getTableMapper(attribute.getJavaType());
             String tableName = information.getTableName();
             return appendTableAlias(tableName, index, sb);
         }
 
-        protected AttributeColumnMapper getAttribute(PathExpression path) {
-            AttributeColumnMapper attribute = null;
+        protected ColumnMapper getAttribute(PathExpression path) {
+            ColumnMapper attribute = null;
             for (String s : path.path()) {
-                EntityTableMapper<?> entityInfo = attribute == null
+                TableMapper entityInfo = attribute == null
                         ? rootEntityInfo
-                        : getEntityInformation(attribute);
-                attribute = entityInfo.getAttribute(s);
+                        : getTableMapper(attribute);
+                attribute = entityInfo.getMapperByAttributeName(s);
             }
             return attribute;
         }
@@ -463,7 +472,7 @@ public class MysqlSqlBuilder implements PreparedSqlBuilder {
         protected void appendSelectedPath() {
             Iterable<Expression> select = criteria.selectClause();
             if (select == null || !select.iterator().hasNext()) {
-                select = rootEntityInfo.getBasicAttributes()
+                select = rootEntityInfo.getBasicColumnMappers()
                         .stream()
                         .map(i -> {
                             String fieldName = i.getFieldName();

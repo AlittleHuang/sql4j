@@ -39,6 +39,12 @@ public interface Array<T> extends Iterable<T> {
                 return get(cursor++);
             }
 
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+
         };
     }
 

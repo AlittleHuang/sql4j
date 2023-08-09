@@ -54,6 +54,10 @@ public class JdbcOperator {
         this.precedence = priority;
     }
 
+    public String getSign() {
+        return sign;
+    }
+
     @Override
     public String toString() {
         return sign;

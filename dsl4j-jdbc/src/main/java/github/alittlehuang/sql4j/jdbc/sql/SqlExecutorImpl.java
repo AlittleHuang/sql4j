@@ -3,9 +3,8 @@ package github.alittlehuang.sql4j.jdbc.sql;
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;
 import github.alittlehuang.sql4j.dsl.support.builder.operator.DefaultTuple;
 import github.alittlehuang.sql4j.dsl.util.Tuple;
-import github.alittlehuang.sql4j.jdbc.mapper.AttributeColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.EntityTableMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.EntityTableMappers;
+import github.alittlehuang.sql4j.jdbc.mapper.ColumnMapper;
+import github.alittlehuang.sql4j.jdbc.mapper.jpa.JpaTableMapperFactory;
 import github.alittlehuang.sql4j.jdbc.util.JdbcUtil;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +19,9 @@ import java.util.stream.Collectors;
 public class SqlExecutorImpl implements PreparedSqlExecutor {
 
     protected final SqlExecutor sqlExecutor;
-    protected final EntityTableMappers mappers;
+    protected final JpaTableMapperFactory mappers;
 
-    public SqlExecutorImpl(SqlExecutor sqlExecutor, EntityTableMappers mappers) {
+    public SqlExecutorImpl(SqlExecutor sqlExecutor, JpaTableMapperFactory mappers) {
         this.sqlExecutor = sqlExecutor;
         this.mappers = mappers;
     }
@@ -43,12 +42,12 @@ public class SqlExecutorImpl implements PreparedSqlExecutor {
             for (int i = 0; i < columnsCount; i++) {
                 PathExpression path = selectedPath.get(i);
                 int size = path.length();
-                EntityTableMapper<T> info = mappers.getMapper(type);
+                var info = mappers.getMapper(type);
                 Object entity = row;
                 Object object = resultSet.getObject(i + 1);
                 if (object != null) {
                     for (int j = 0; j < size; j++) {
-                        AttributeColumnMapper attribute = info.getAttribute(path.get(j));
+                        ColumnMapper attribute = info.getMapperByAttributeName(path.get(j));
                         if (j == size - 1) {
                             Class<?> javaType = attribute.getJavaType();
                             if (PRIMITIVE_MAP.getOrDefault(javaType, javaType).isInstance(object)) {
