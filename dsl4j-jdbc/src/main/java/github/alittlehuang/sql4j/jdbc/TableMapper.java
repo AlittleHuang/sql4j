@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.jdbc.mapper;
+package github.alittlehuang.sql4j.jdbc;
 
 import java.util.List;
 

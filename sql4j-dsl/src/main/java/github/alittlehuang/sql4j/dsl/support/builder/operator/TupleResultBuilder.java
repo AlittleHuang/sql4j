@@ -19,7 +19,7 @@ public class TupleResultBuilder implements ResultBuilder<Tuple> {
     @Override
     public List<Tuple> getList(int offset, int maxResult, LockModeType lockModeType) {
         return support.getTypeQueryFactory()
-                .getObjectsTypeQuery(support.buildQuerySpec(), support.getType())
+                .getTupleResultBuilder(support.buildQuerySpec(), support.getType())
                 .getList(offset, maxResult, lockModeType);
     }
 
@@ -27,7 +27,7 @@ public class TupleResultBuilder implements ResultBuilder<Tuple> {
     @Override
     public int count() {
         return support.getTypeQueryFactory()
-                .getEntityResultQuery(support.buildQuerySpec(), support.getType())
+                .getEntityResultBuilder(support.buildQuerySpec(), support.getType())
                 .count();
     }
 
@@ -35,7 +35,7 @@ public class TupleResultBuilder implements ResultBuilder<Tuple> {
     @Override
     public boolean exist(int offset) {
         return support.getTypeQueryFactory()
-                .getEntityResultQuery(support.buildQuerySpec(), support.getType())
+                .getEntityResultBuilder(support.buildQuerySpec(), support.getType())
                 .exist(offset);
     }
 }

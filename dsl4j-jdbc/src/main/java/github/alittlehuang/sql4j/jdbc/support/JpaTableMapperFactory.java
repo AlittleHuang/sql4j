@@ -1,13 +1,12 @@
-package github.alittlehuang.sql4j.jdbc.mapper.jpa;
+package github.alittlehuang.sql4j.jdbc.support;
 
-import github.alittlehuang.sql4j.jdbc.mapper.BasicColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.ColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.TableMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.TableMapperFactory;
-import github.alittlehuang.sql4j.jdbc.mapper.model.SimpleBasicColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.model.SimpleColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.model.SimpleJoinColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.model.SimpleTableMapper;
+import github.alittlehuang.sql4j.jdbc.BasicColumnMapper;
+import github.alittlehuang.sql4j.jdbc.ColumnMapper;
+import github.alittlehuang.sql4j.jdbc.TableMapper;
+import github.alittlehuang.sql4j.jdbc.support.model.SimpleBasicColumnMapper;
+import github.alittlehuang.sql4j.jdbc.support.model.SimpleColumnMapper;
+import github.alittlehuang.sql4j.jdbc.support.model.SimpleJoinColumnMapper;
+import github.alittlehuang.sql4j.jdbc.support.model.SimpleTableMapper;
 import github.alittlehuang.sql4j.jdbc.util.ReflectUtil;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
@@ -23,19 +22,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class JpaTableMapperFactory implements TableMapperFactory {
+public class JpaTableMapperFactory extends CachedTableMapperFactory {
 
     public static final String FIX = "`";
-    private final Map<Class<?>, TableMapper> cache = new ConcurrentHashMap<>();
 
-    @Override
-    public TableMapper getMapper(Class<?> type) {
-        return cache.computeIfAbsent(type, this::doGetMapper);
+    public JpaTableMapperFactory() {
     }
 
-    private TableMapper doGetMapper(Class<?> type) {
+    @Override
+    public TableMapper createMapper(Class<?> type) {
         SimpleTableMapper tableMapper = new SimpleTableMapper();
         tableMapper.setJavaType(type);
         List<ColumnMapper> columnMappers = getColumnMappers(type);
@@ -133,8 +129,8 @@ public class JpaTableMapperFactory implements TableMapperFactory {
                 SimpleBasicColumnMapper m = new SimpleBasicColumnMapper();
                 Column column = getAnnotation(field, getter, Column.class);
                 m.setColumnName(getColumnName(field, column));
-                m.setInsertable(column != null && column.insertable());
-                m.setUpdatable(column != null && column.updatable());
+                m.setInsertable(column == null || column.insertable());
+                m.setUpdatable(column == null || column.updatable());
                 mapper = m;
             } else {
                 SimpleJoinColumnMapper m = new SimpleJoinColumnMapper();
@@ -182,10 +178,6 @@ public class JpaTableMapperFactory implements TableMapperFactory {
             columnName = columnName.substring(1, columnName.length() - 1);
         }
         return columnName;
-    }
-
-    private <T extends Annotation> T getAnnotation(ColumnMapper columnMapper, Class<T> annotationClass) {
-        return getAnnotation(columnMapper.getField(), columnMapper.getGetter(), annotationClass);
     }
 
     private <T extends Annotation> T getAnnotation(Field field, Method getter, Class<T> annotationClass) {

@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.jdbc.sql;
+package github.alittlehuang.sql4j.jdbc.support;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +13,7 @@ class SqlLogger {
     public static BiFunction<String, Object[], String> sqlArgsFormat = null;
 
 
-    static void traceSql(String sql, List<Object[]> args) {
+    static void traceBatchSql(String sql, List<Object[]> args) {
         if (log.isDebugEnabled()) {
             if (sqlArgsFormat != null) {
                 for (Object[] arg : args) {
@@ -31,6 +31,18 @@ class SqlLogger {
         if (log.isDebugEnabled()) {
             if (sqlArgsFormat != null) {
                 log.debug(sqlArgsFormat.apply(sql, args));
+            } else if (sqlFormat != null) {
+                log.debug(sqlFormat.apply(sql));
+            } else {
+                log.debug(sql);
+            }
+        }
+    }
+
+    static void traceSql(String sql, List<Object> args) {
+        if (log.isDebugEnabled()) {
+            if (sqlArgsFormat != null) {
+                log.debug(sqlArgsFormat.apply(sql, args.toArray()));
             } else if (sqlFormat != null) {
                 log.debug(sqlFormat.apply(sql));
             } else {

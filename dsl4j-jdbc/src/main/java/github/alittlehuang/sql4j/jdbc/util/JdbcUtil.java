@@ -3,6 +3,7 @@ package github.alittlehuang.sql4j.jdbc.util;
 import github.alittlehuang.sql4j.dsl.util.TypeCastUtil;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +21,22 @@ public abstract class JdbcUtil {
 
     private static final Map<Class<?>, Object> SINGLE_ENUM_MAP = new ConcurrentHashMap<>();
     private static final Map<Class<?>, ResultSetGetter<?>> GETTER_MAPS = new HashMap<>();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAP = getPrimitiveMap();
+
+    @NotNull
+    private static Map<Class<?>, Class<?>> getPrimitiveMap() {
+        HashMap<Class<?>, Class<?>> map = new HashMap<>();
+        Class<?>[]
+                types = {Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE, Integer.TYPE,
+                Long.TYPE, Float.TYPE, Double.TYPE, Void.TYPE},
+                types2 = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class,
+                        Long.class, Float.class, Double.class, Void.class};
+
+        for (int i = 0; i < types.length; i++) {
+            map.put(types[i], types2[i]);
+        }
+        return map;
+    }
 
     static {
 
@@ -52,22 +69,36 @@ public abstract class JdbcUtil {
 
     }
 
+    public static Class<?> getWrapedClass(Class<?> javaType) {
+        return PRIMITIVE_MAP.getOrDefault(javaType, javaType);
+    }
 
-    public static <X> X getValue(ResultSet resultSet, int index, Class<X> targetType) throws SQLException {
+
+    public static <X> X getValue(ResultSet resultSet, int column, Class<X> targetType) throws SQLException {
         Object result;
         ResultSetGetter<?> getter = GETTER_MAPS.get(targetType);
         if (getter == null) {
             if (Enum.class.isAssignableFrom(targetType)) {
-                result = getEnum(targetType, resultSet.getInt(index));
+                result = getEnum(targetType, resultSet.getInt(column));
             } else {
-                result = resultSet.getObject(index);
+                result = resultSet.getObject(column);
             }
         } else {
-            result = getter.getValue(resultSet, index);
+            result = getter.getValue(resultSet, column);
         }
         return TypeCastUtil.cast(result);
     }
 
+
+    public static void setParam(PreparedStatement pst, List<Object> args) throws SQLException {
+        int i = 0;
+        for (Object arg : args) {
+            if (arg instanceof Enum) {
+                arg = ((Enum<?>) arg).ordinal();
+            }
+            pst.setObject(++i, arg);
+        }
+    }
 
     public static void setParam(PreparedStatement pst, Object[] args) throws SQLException {
         int i = 0;

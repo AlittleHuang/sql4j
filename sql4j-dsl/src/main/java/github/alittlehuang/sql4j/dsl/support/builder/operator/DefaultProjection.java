@@ -13,6 +13,6 @@ public class DefaultProjection<T> implements Projection {
 
     @Override
     public <R> ResultBuilder<R> projected(Class<R> projectionType) {
-        return structured.getTypeQueryFactory().getProjectionQuery(structured.buildQuerySpec(), structured.getType(), projectionType);
+        return structured.getTypeQueryFactory().getProjectionResultBuilder(structured.buildQuerySpec(), structured.getType(), projectionType);
     }
 }

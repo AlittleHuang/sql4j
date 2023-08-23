@@ -5,26 +5,20 @@ import github.alittlehuang.sql4j.dsl.builder.Query;
 import github.alittlehuang.sql4j.dsl.support.Configure;
 import github.alittlehuang.sql4j.dsl.support.ResultBuilderFactory;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
 @Setter
-public abstract class AbstractQueryBuilder implements QueryBuilder {
+public class AbstractQueryBuilder implements QueryBuilder {
 
-    private final ResultBuilderFactory typeQueryFactory;
+    private final ResultBuilderFactory resultBuilderFactory;
     private Configure configure = Configure.DEFAULT;
 
-    public AbstractQueryBuilder(ResultBuilderFactory typeQueryFactory) {
-        this.typeQueryFactory = typeQueryFactory;
+    public AbstractQueryBuilder(ResultBuilderFactory resultBuilderFactory) {
+        this.resultBuilderFactory = resultBuilderFactory;
     }
 
     @Override
     public <T> Query<T> query(Class<T> type) {
-        QuerySupport<T> support = QuerySupport.of(type, typeQueryFactory, configure);
-        return query(support);
-    }
-
-    @NotNull
-    public static <T> DefaultQuery<T> query(QuerySupport<T> support) {
+        QuerySupport<T> support = QuerySupport.of(type, resultBuilderFactory, configure);
         return new DefaultQuery<>(support);
     }
 

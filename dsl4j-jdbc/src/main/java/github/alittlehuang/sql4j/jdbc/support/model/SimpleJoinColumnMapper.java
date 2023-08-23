@@ -1,6 +1,6 @@
-package github.alittlehuang.sql4j.jdbc.mapper.model;
+package github.alittlehuang.sql4j.jdbc.support.model;
 
-import github.alittlehuang.sql4j.jdbc.mapper.JoinColumnMapper;
+import github.alittlehuang.sql4j.jdbc.JoinColumnMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -53,7 +53,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
 
     @Override
     public int count() {
-        return typeQueryFactory.getEntityResultQuery(querySpec, type).count();
+        return typeQueryFactory.getEntityResultBuilder(querySpec, type).count();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
         Array<Expression> array = new ConstantArray<>(selections);
 
         QuerySpecification structuredQuery = querySpec.updateSelect(array);
-        List<Tuple> objects = typeQueryFactory.getObjectsTypeQuery(structuredQuery, type)
+        List<Tuple> objects = typeQueryFactory.getTupleResultBuilder(structuredQuery, type)
                 .getList(offset, maxResult, lockModeType);
         return objects.stream()
                 .map(os -> mapToRejection(info, paths, os, projectionType))
@@ -168,7 +168,7 @@ public class ProjectionResultBuilder<T, R> implements ResultBuilder<R> {
 
     @Override
     public boolean exist(int offset) {
-        return typeQueryFactory.getEntityResultQuery(querySpec, type).exist(offset);
+        return typeQueryFactory.getEntityResultBuilder(querySpec, type).exist(offset);
     }
 
     private interface ProjectionProxyInstance {

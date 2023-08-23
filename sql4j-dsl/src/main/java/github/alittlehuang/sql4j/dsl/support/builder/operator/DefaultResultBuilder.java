@@ -15,20 +15,20 @@ public class DefaultResultBuilder<T> implements ResultBuilder<T> {
 
     @Override
     public int count() {
-        return structured.getTypeQueryFactory().getEntityResultQuery(structured.buildQuerySpec(), structured.getType()).count();
+        return structured.getTypeQueryFactory().getEntityResultBuilder(structured.buildQuerySpec(), structured.getType()).count();
     }
 
     @Override
     public List<T> getList(int offset, int maxResult, LockModeType lockModeType) {
         return structured.getTypeQueryFactory()
-                .getEntityResultQuery(structured.buildQuerySpec(), structured.getType())
+                .getEntityResultBuilder(structured.buildQuerySpec(), structured.getType())
                 .getList(offset, maxResult, lockModeType);
     }
 
     @Override
     public boolean exist(int offset) {
         return structured.getTypeQueryFactory()
-                .getEntityResultQuery(structured.buildQuerySpec(), structured.getType())
+                .getEntityResultBuilder(structured.buildQuerySpec(), structured.getType())
                 .exist(offset);
     }
 }

@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.jdbc.sql;
+package github.alittlehuang.sql4j.jdbc;
 
 
 import github.alittlehuang.sql4j.dsl.expression.PathExpression;

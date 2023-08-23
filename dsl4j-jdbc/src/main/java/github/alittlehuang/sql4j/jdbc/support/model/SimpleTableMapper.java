@@ -1,8 +1,8 @@
-package github.alittlehuang.sql4j.jdbc.mapper.model;
+package github.alittlehuang.sql4j.jdbc.support.model;
 
-import github.alittlehuang.sql4j.jdbc.mapper.BasicColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.ColumnMapper;
-import github.alittlehuang.sql4j.jdbc.mapper.TableMapper;
+import github.alittlehuang.sql4j.jdbc.BasicColumnMapper;
+import github.alittlehuang.sql4j.jdbc.ColumnMapper;
+import github.alittlehuang.sql4j.jdbc.TableMapper;
 import lombok.Data;
 
 import java.util.List;

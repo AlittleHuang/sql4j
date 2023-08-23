@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.jdbc.mysql;
+package github.alittlehuang.sql4j.jdbc.support;
 
 import github.alittlehuang.sql4j.dsl.expression.Operator;
 import lombok.Getter;

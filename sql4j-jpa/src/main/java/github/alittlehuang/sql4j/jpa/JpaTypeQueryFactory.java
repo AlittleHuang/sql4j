@@ -23,18 +23,18 @@ public class JpaTypeQueryFactory implements ResultBuilderFactory {
     }
 
     @Override
-    public <T> ResultBuilder<T> getEntityResultQuery(QuerySpecification criteriaQuery, Class<T> type) {
-        return new JpaEntityResultBuilder<>(entityManager, type, criteriaQuery);
+    public <T> ResultBuilder<T> getEntityResultBuilder(QuerySpecification spec, Class<T> type) {
+        return new JpaEntityResultBuilder<>(entityManager, type, spec);
     }
 
     @Override
-    public <T, R> ResultBuilder<R> getProjectionQuery(QuerySpecification spec, Class<T> type, Class<R> projectionType) {
+    public <T, R> ResultBuilder<R> getProjectionResultBuilder(QuerySpecification spec, Class<T> type, Class<R> projectionType) {
         return new ProjectionResultBuilder<>(this, spec, type, projectionType, metaProvider);
     }
 
     @Override
-    public ResultBuilder<Tuple> getObjectsTypeQuery(QuerySpecification criteriaQuery, Class<?> type) {
-        return new JpaObjectsResultBuilder<>(entityManager, type, criteriaQuery);
+    public ResultBuilder<Tuple> getTupleResultBuilder(QuerySpecification spec, Class<?> type) {
+        return new JpaObjectsResultBuilder<>(entityManager, type, spec);
     }
 
 

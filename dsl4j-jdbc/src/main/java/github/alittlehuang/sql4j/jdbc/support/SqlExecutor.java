@@ -1,4 +1,4 @@
-package github.alittlehuang.sql4j.jdbc.sql;
+package github.alittlehuang.sql4j.jdbc.support;
 
 import github.alittlehuang.sql4j.jdbc.util.JdbcUtil;
 import lombok.SneakyThrows;
@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface SqlExecutor {
 
     <T> T execute(ConnectionCallback<T> connectionCallback) throws SQLException;
@@ -37,7 +38,7 @@ public interface SqlExecutor {
 
     @SneakyThrows
     default int[] batchUpdate(String sql, List<Object[]> batchArgs) {
-        SqlLogger.traceSql(sql, batchArgs);
+        SqlLogger.traceBatchSql(sql, batchArgs);
         return execute(connection -> {
             PreparedStatement pst = connection.prepareStatement(sql);
             JdbcUtil.setParamBatch(pst, batchArgs);
@@ -48,6 +49,20 @@ public interface SqlExecutor {
     @SneakyThrows
     default <T> T query(String sql,
                         Object[] args,
+                        ResultSetCallback<T> resultSetCallback) {
+        SqlLogger.traceSql(sql, args);
+        return execute(connection -> {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            JdbcUtil.setParam(statement, args);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSetCallback.doInResultSet(resultSet);
+            }
+        });
+    }
+
+    @SneakyThrows
+    default <T> T query(String sql,
+                        List<Object> args,
                         ResultSetCallback<T> resultSetCallback) {
         SqlLogger.traceSql(sql, args);
         return execute(connection -> {
@@ -78,7 +93,7 @@ public interface SqlExecutor {
     default <T> T batchInsertAndReturnGeneratedKeys(String sql,
                                                     List<Object[]> batchArgs,
                                                     ResultSetCallback<T> resultSetCallback) {
-        SqlLogger.traceSql(sql, batchArgs);
+        SqlLogger.traceBatchSql(sql, batchArgs);
         return execute(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             JdbcUtil.setParamBatch(ps, batchArgs);
@@ -96,7 +111,7 @@ public interface SqlExecutor {
 
     @FunctionalInterface
     interface ResultSetCallback<T> {
-        T doInResultSet(ResultSet connection) throws SQLException;
+        T doInResultSet(ResultSet resultSet) throws SQLException;
     }
 
 }
